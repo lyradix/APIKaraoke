@@ -7,3 +7,4 @@ composer require symfony/property-access
 composer require symfony/property-info
 composer require nelmio/cors-bundle
 composer require endroid/qr-code
+composer require --dev symfony/maker-bundle
