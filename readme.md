@@ -8,3 +8,9 @@ composer require symfony/property-info
 composer require nelmio/cors-bundle
 composer require endroid/qr-code
 composer require --dev symfony/maker-bundle
+
+# launch the app 
+
+symfony server:stop
+symfony server:start --no-tls --allow-http --port=8000 --allow-all-ip
+
