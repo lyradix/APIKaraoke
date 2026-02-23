@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Song;
+use App\Entity\Room;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,7 +24,8 @@ final class IndexController extends AbstractController
     }
 
     #[Route('/importCSV', name: 'app_import_csv', methods: ['POST'])]
-    public function importCSV(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function importCSV(Request $request, 
+    EntityManagerInterface $entityManager): JsonResponse
     {
         /** @var UploadedFile $file */
         $file = $request->files->get('file');
@@ -73,5 +75,46 @@ final class IndexController extends AbstractController
 
         return new JsonResponse($data, JsonResponse::HTTP_OK);
     }
+
+    #[Route('/postRoom', name: 'app_post_room', methods: ['POST'])]
+    public function postRoom(
+    Request $request, 
+    EntityManagerInterface $entityManager
+): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
+    if (!isset($data['name']) || !isset($data['date']) || !isset($data['place'])) {
+        return new JsonResponse(['error' => 'Name, date, and place are required'], JsonResponse::HTTP_BAD_REQUEST);
+    }
+
+    $room = new Room();
+    $room->setName($data['name']);
+    $room->setPlace($data['place']);
+    $room->setDate(new \DateTime($data['date']));
+    $entityManager->persist($room);
+    $entityManager->flush();
+
+    return new JsonResponse(['message' => 'Room created successfully', 'id' => $room->getId()], JsonResponse::HTTP_CREATED);
+}
+
+    #[Route('/rooms', name: 'app_rooms', methods: ['GET'])]
+    public function getRooms(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $rooms = $entityManager->getRepository(Room::class)->findAll();
+        $data = [];
+
+        foreach ($rooms as $room) {
+            $data[] = [
+                'id' => $room->getId(),
+                'name' => $room->getName(),
+                'place' => $room->getPlace(),
+                'date' => $room->getDate()->format('Y-m-d H:i:s'),
+            ];
+        }
+
+        return new JsonResponse($data, JsonResponse::HTTP_OK);
+    }   
+    
+
 
 }
