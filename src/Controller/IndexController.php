@@ -75,6 +75,23 @@ final class IndexController extends AbstractController
 
         return new JsonResponse($data, JsonResponse::HTTP_OK);
     }
+//delete song by id
+#[Route('/deleteSong/{id}', name: 'app_delete_song', methods: ['DELETE'])]
+    public function deleteSong(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $song = $entityManager->getRepository(Song::class)->find($id);
+
+        if (!$song) {
+            return new JsonResponse(['error' => 'Song not found'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $entityManager->remove($song);
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'Song deleted successfully'], JsonResponse::HTTP_OK);
+    }
+
+
 
     #[Route('/postRoom', name: 'app_post_room', methods: ['POST'])]
     public function postRoom(
@@ -114,6 +131,8 @@ final class IndexController extends AbstractController
 
         return new JsonResponse($data, JsonResponse::HTTP_OK);
     }   
+
+    
     
 
 
