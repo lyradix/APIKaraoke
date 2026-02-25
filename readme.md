@@ -11,6 +11,6 @@ composer require --dev symfony/maker-bundle
 
 # launch the app 
 
-symfony server:stop
-symfony server:start --no-tls --allow-http --port=8000 --allow-all-ip
+http://192.168.1.164:8000
+
 
