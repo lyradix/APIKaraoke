@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Entity\Singer;
 use App\Entity\Song;
 use App\Entity\Room;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -75,6 +76,7 @@ final class IndexController extends AbstractController
 
         return new JsonResponse($data, JsonResponse::HTTP_OK);
     }
+
 //delete song by id
 #[Route('/deleteSong/{id}', name: 'app_delete_song', methods: ['DELETE'])]
     public function deleteSong(int $id, EntityManagerInterface $entityManager): JsonResponse
@@ -132,7 +134,42 @@ final class IndexController extends AbstractController
         return new JsonResponse($data, JsonResponse::HTTP_OK);
     }   
 
-    
+    #[Route('/singers', name: 'app_singers', methods: ['GET'])]
+    public function getSingers(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $singers = $entityManager->getRepository(Singer::class)->findAll();
+        $data = [];
+
+        foreach ($singers as $singer) {
+            $data[] = [
+                'id' => $singer->getId(),
+                'nickname' => $singer->getNickname(),
+                'email' => $singer->getEmail(),
+         
+            ];
+        }
+        return new JsonResponse($data, JsonResponse::HTTP_OK);
+    }   
+
+      #[Route('/postSinger', name: 'app_post_singer', methods: ['POST'])]
+    public function postSinger(
+    Request $request, 
+    EntityManagerInterface $entityManager
+): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
+    if (!isset($data['nickname']) || !isset($data['email'])) {
+        return new JsonResponse(['error' => 'Nickname and email are required'], JsonResponse::HTTP_BAD_REQUEST);
+    }
+
+    $singer = new Singer();
+    $singer->setName($data['nickname']);
+    $singer->setPlace($data['email']);
+    $entityManager->persist($singer);
+    $entityManager->flush();
+
+    return new JsonResponse(['message' => 'Room created successfully', 'id' => $room->getId()], JsonResponse::HTTP_CREATED);
+}
     
 
 

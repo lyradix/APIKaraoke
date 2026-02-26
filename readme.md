@@ -10,7 +10,11 @@ composer require endroid/qr-code
 composer require --dev symfony/maker-bundle
 
 # launch the app 
+symfony server:stop
+symfony serve --no-tls --port=8000
+php -S 0.0.0.0:8000 -t public
 
-http://192.168.1.164:8000
+check if LAN accessible
+netstat -ano | findstr :8000
 
 
