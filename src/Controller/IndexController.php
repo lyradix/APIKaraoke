@@ -163,12 +163,12 @@ final class IndexController extends AbstractController
     }
 
     $singer = new Singer();
-    $singer->setName($data['nickname']);
-    $singer->setPlace($data['email']);
+    $singer->setNickname($data['nickname']);
+    $singer->setEmail($data['email']);
     $entityManager->persist($singer);
     $entityManager->flush();
 
-    return new JsonResponse(['message' => 'Room created successfully', 'id' => $room->getId()], JsonResponse::HTTP_CREATED);
+    return new JsonResponse(['message' => 'Singer created successfully', 'id' => $singer->getId()], JsonResponse::HTTP_CREATED);
 }
     
 
